@@ -20,9 +20,36 @@ const displayNotes = (notes) => {
   notesContainer.innerHTML = '';
   notes.forEach((note) => {
     const li = document.createElement('li');
-    li.textContent = note.title;
-    li.dataset.id = note.id;
-    li.addEventListener('click', () => displayNote(note));
+    li.style.display = 'flex';
+    li.style.justifyContent = 'space-between';
+    li.style.alignItems = 'center';
+    li.style.padding = '0.5rem 0';
+    li.style.borderBottom = '1px solid #ccc';
+    li.style.cursor = 'pointer';
+
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = note.title;
+    titleSpan.style.flex = '1';
+    titleSpan.addEventListener('click', () => displayNote(note));
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.style.marginLeft = '10px';
+    deleteBtn.style.backgroundColor = '#e74c3c';
+    deleteBtn.style.color = '#fff';
+    deleteBtn.style.border = 'none';
+    deleteBtn.style.padding = '0.3rem 0.6rem';
+    deleteBtn.style.borderRadius = '4px';
+    deleteBtn.style.cursor = 'pointer';
+    deleteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (confirm(`Are you sure you want to delete "${note.title}"?`)) {
+        handleDelete(note.id);
+      }
+    });
+
+    li.appendChild(titleSpan);
+    li.appendChild(deleteBtn);
     notesContainer.appendChild(li);
   });
 };
@@ -80,7 +107,7 @@ const clearForm = () => {
   newNoteButton.classList.add('hidden');
 };
 
-// BONUS: Handle deleting a note
+// Handle deleting a note
 const handleDelete = async (id) => {
   const response = await fetch(`/api/notes/${id}`, {
     method: 'DELETE',
