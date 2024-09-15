@@ -11,11 +11,14 @@ let activeNote = null;
 // Fetch and display all notes
 const fetchNotes = async () => {
   try {
+    console.log('Fetching notes from /api/notes');
     const response = await fetch('/api/notes');
+    console.log('Received response:', response);
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error(`Network response was not ok: ${response.statusText}`);
     }
     const notes = await response.json();
+    console.log('Fetched notes:', notes);
     displayNotes(notes);
   } catch (error) {
     console.error('Error fetching notes:', error);
@@ -91,6 +94,7 @@ saveButton.addEventListener('click', async () => {
 
       if (response.ok) {
         const newNote = await response.json();
+        console.log('Note saved:', newNote);
         fetchNotes();
         clearForm();
       } else {
@@ -137,6 +141,7 @@ const handleDelete = async (id) => {
     });
 
     if (response.ok) {
+      console.log(`Note with ID ${id} deleted.`);
       fetchNotes();
       if (activeNote && activeNote.id === id) {
         clearForm();

@@ -45,24 +45,16 @@ const writeNotes = (notes) => {
   });
 };
 
-// HTML Routes
-
-// GET /notes - Serve notes.html
-app.get('/notes', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'notes.html'));
-});
-
-// GET * - Serve index.html for any other routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// API Routes
+// =====================
+// API Routes - Define First
+// =====================
 
 // GET /api/notes - Return all notes as JSON
 app.get('/api/notes', async (req, res) => {
+  console.log('Received GET /api/notes request');
   try {
     const notes = await readNotes();
+    console.log('Successfully retrieved notes:', notes);
     res.json(notes);
   } catch (error) {
     console.error('Error reading notes:', error);
@@ -88,6 +80,7 @@ app.post('/api/notes', async (req, res) => {
     const notes = await readNotes();
     notes.push(newNote);
     await writeNotes(notes);
+    console.log('Note saved successfully:', newNote);
     res.json(newNote);
   } catch (error) {
     console.error('Error saving note:', error);
@@ -109,11 +102,26 @@ app.delete('/api/notes/:id', async (req, res) => {
     }
 
     await writeNotes(notes);
+    console.log(`Note with ID ${noteId} deleted successfully.`);
     res.json({ message: 'Note deleted successfully.' });
   } catch (error) {
     console.error('Error deleting note:', error);
     res.status(500).json({ error: 'Failed to delete note.' });
   }
+});
+
+// =====================
+// HTML Routes - Define After API Routes
+// =====================
+
+// GET /notes - Serve notes.html
+app.get('/notes', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'notes.html'));
+});
+
+// GET * - Serve index.html for any other routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start the server
