@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notes</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Notes</h1>
+    <nav>
+      <!-- Initially, show Save and Clear buttons; hide New Note button -->
+      <button id="save-note">Save Note</button>
+      <button id="clear-form">Clear Form</button>
+      <button id="new-note" class="hidden">New Note</button>
+    </nav>
+  </header>
+  <main>
+    <section class="notes-list">
+      <h2>Existing Notes</h2>
+      <ul id="notes-container">
+        <!-- Existing notes will be appended here -->
+      </ul>
+    </section>
+    <section class="note-form">
+      <h2>New Note</h2>
+      <form id="note-form">
+        <input type="text" id="note-title" placeholder="Note Title" required>
+        <textarea id="note-text" placeholder="Note Text" required></textarea>
+      </form>
+    </section>
+  </main>
+  <script src="assets/js/notes.js"></script>
+</body>
+</html>

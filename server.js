@@ -95,7 +95,7 @@ app.post('/api/notes', async (req, res) => {
   }
 });
 
-// BONUS: DELETE /api/notes/:id - Delete a note by ID
+// DELETE /api/notes/:id - Delete a note by ID
 app.delete('/api/notes/:id', async (req, res) => {
   const noteId = req.params.id;
 

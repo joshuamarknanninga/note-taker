@@ -10,14 +10,26 @@ let activeNote = null;
 
 // Fetch and display all notes
 const fetchNotes = async () => {
-  const response = await fetch('/api/notes');
-  const notes = await response.json();
-  displayNotes(notes);
+  try {
+    const response = await fetch('/api/notes');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const notes = await response.json();
+    displayNotes(notes);
+  } catch (error) {
+    console.error('Error fetching notes:', error);
+    notesContainer.innerHTML = '<li>Error loading notes.</li>';
+  }
 };
 
 // Display notes in the list
 const displayNotes = (notes) => {
   notesContainer.innerHTML = '';
+  if (notes.length === 0) {
+    notesContainer.innerHTML = '<li>No notes available.</li>';
+    return;
+  }
   notes.forEach((note) => {
     const li = document.createElement('li');
     li.style.display = 'flex';
@@ -70,19 +82,27 @@ saveButton.addEventListener('click', async () => {
   const text = noteText.value.trim();
 
   if (title && text) {
-    const response = await fetch('/api/notes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, text }),
-    });
+    try {
+      const response = await fetch('/api/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, text }),
+      });
 
-    if (response.ok) {
-      const newNote = await response.json();
-      fetchNotes();
-      clearForm();
-    } else {
-      alert('Failed to save note.');
+      if (response.ok) {
+        const newNote = await response.json();
+        fetchNotes();
+        clearForm();
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to save note: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error('Error saving note:', error);
+      alert('Failed to save note due to a network error.');
     }
+  } else {
+    alert('Please enter both a title and text for the note.');
   }
 });
 
@@ -95,6 +115,8 @@ clearButton.addEventListener('click', () => {
 newNoteButton.addEventListener('click', () => {
   clearForm();
   newNoteButton.classList.add('hidden');
+  saveButton.classList.remove('hidden');
+  clearButton.classList.remove('hidden');
 });
 
 // Clear the form fields and reset buttons
@@ -109,17 +131,30 @@ const clearForm = () => {
 
 // Handle deleting a note
 const handleDelete = async (id) => {
-  const response = await fetch(`/api/notes/${id}`, {
-    method: 'DELETE',
-  });
+  try {
+    const response = await fetch(`/api/notes/${id}`, {
+      method: 'DELETE',
+    });
 
-  if (response.ok) {
-    fetchNotes();
-    clearForm();
-  } else {
-    alert('Failed to delete note.');
+    if (response.ok) {
+      fetchNotes();
+      if (activeNote && activeNote.id === id) {
+        clearForm();
+      }
+    } else {
+      const errorData = await response.json();
+      alert(`Failed to delete note: ${errorData.error}`);
+    }
+  } catch (error) {
+    console.error('Error deleting note:', error);
+    alert('Failed to delete note due to a network error.');
   }
 };
 
 // Initialize
-fetchNotes();
+const initialize = () => {
+  fetchNotes();
+  clearForm(); // Ensure the form is in the correct initial state
+};
+
+initialize();
